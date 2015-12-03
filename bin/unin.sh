@@ -17,6 +17,7 @@ if [ -e /system/bin/philz.cpio ]; then
     ${BUSYBOX} rm /system/bin/philz.cpio
 fi
 
+#old
 if [ -e /system/bin/recovery.cpio ]; then
     ${BUSYBOX} rm /system/bin/recovery.cpio
 fi
