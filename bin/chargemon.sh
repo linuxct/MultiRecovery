@@ -87,7 +87,7 @@ if [ ! -e /cache/recovery/boot ];then
 fi
 
 #Check if we need to kill SElinux :]
-ANDROIDVER=`${BUSYBOX} echo "$(GETPROP ro.build.version.release) 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
+ANDROIDVER=`${BUSYBOX} echo "$(GETPROP ro.build.version.release) 5.1.1" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
 if [ "$ANDROIDVER" = "lollipop" ]; then
 	if [ -e "/system/lib/modules/byeselinux.ko" ]; then
 		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
