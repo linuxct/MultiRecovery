@@ -34,16 +34,21 @@ v0.7
 - Compatibility with legacy e2fsck script inside the installer (Option number 2: "Install MultiRecovery (Android 4.4.x)")
 - New Linux/OSX installer script (WIP, only supports installation of Android 5.1.1 Recovery. Will be improved in the future).
 - Updated BusyBox.
+
 v0.6 
 - Fixed USB connection, adb shell commands can be used while device is in recovery mode.
+
 v0.5 
 - Added button management, vol-up for TWRP, camera button for CWM.
 - Added TWRP Recovery v2.8.1.0 to installer.
+
 v0.4
 - Temp fixes in a script to catch key events. 
+
 v0.3 
 - Changes in recovery.fstab to avoid messages about /misc partition.
 - Used a new compilation of busybox to correct error: unzip zip flags 1 and 8 are not supported.
+
 v0.2 
 - The zip files is packed with other update-binary.
 - The flashable zip can be used with PRFcreator.
