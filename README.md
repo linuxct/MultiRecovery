@@ -1,7 +1,8 @@
-Multiple Recovery Solution for Xperia M2
+Multiple Recovery solution for Xperia M2
 ========================================
 
 Recovey installer / flashable zip for locked bootloader. Compatible with Windows/Linux/Mac.
+
 Uses chargemon and e2fsck as hijack binary.
 
 Requirements:
