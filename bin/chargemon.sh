@@ -7,14 +7,7 @@ G_LED=/sys/class/leds/rgb_green/brightness
 B_LED=/sys/class/leds/rgb_blue/brightness
 R_LED=/sys/class/leds/rgb_red/brightness
 WORKDIR="/cache/multirecovery"
-GETPROP() {
-	PROP=$(${BUSYBOX} grep "$VAR" /system/build.prop | ${BUSYBOX} awk -F'=' '{ print $NF }')
-	if [ "$VAR" != "" -a "$PROP" != "" ]; then
-		echo $PROP
-	else
-		echo "null"
-	fi
-}
+VER=$(awk -F='/ro\.build\.version\.release/{print $NF}' /system/build.prop)
 
 # set busybox variables
 MKDIR="${BUSYBOX} mkdir"
@@ -87,7 +80,7 @@ if [ ! -e /cache/recovery/boot ];then
 fi
 
 #Check if we need to kill SElinux :]
-ANDROIDVER=`${BUSYBOX} echo "$(GETPROP ro.build.version.release) 5.1.1" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
+ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
 if [ "$ANDROIDVER" = "lollipop" ]; then
 	if [ -e "/system/lib/modules/byeselinux.ko" ]; then
 		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
