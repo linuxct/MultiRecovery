@@ -1,7 +1,7 @@
 #!/data/local/tmp/recovery/busybox sh
 
 BUSYBOX=/data/local/tmp/recovery/busybox
-VER=$(awk -F='/ro\.build\.version\.release/{print $NF}' /system/build.prop)
+VER=$(awk -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop) 
 
 echo "remount /system writable"
 ${BUSYBOX} mount -o remount,rw /system

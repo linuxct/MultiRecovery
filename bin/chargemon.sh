@@ -17,7 +17,7 @@ set6=/sys/class/illumination/6
 set7=/sys/class/illumination/7
 set8=/sys/class/illumination/8
 WORKDIR="/cache/multirecovery"
-VER=$(awk -F='/ro\.build\.version\.release/{print $NF}' /system/build.prop)
+VER=$(awk -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop) 
 
 # set busybox variables
 MKDIR="${BUSYBOX} mkdir"
