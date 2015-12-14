@@ -6,15 +6,18 @@ VIB=/sys/class/timed_output/vibrator/enable
 G_LED=/sys/class/leds/rgb_green/brightness
 B_LED=/sys/class/leds/rgb_blue/brightness
 R_LED=/sys/class/leds/rgb_red/brightness
+# set illumination bar paths
+set0=/sys/class/illumination/0
+set1=/sys/class/illumination/1
+set2=/sys/class/illumination/2
+set3=/sys/class/illumination/3
+set4=/sys/class/illumination/4
+set5=/sys/class/illumination/5
+set6=/sys/class/illumination/6
+set7=/sys/class/illumination/7
+set8=/sys/class/illumination/8
 WORKDIR="/cache/multirecovery"
-GETPROP() {
-	PROP=$(${BUSYBOX} grep "$VAR" /system/build.prop | ${BUSYBOX} awk -F'=' '{ print $NF }')
-	if [ "$VAR" != "" -a "$PROP" != "" ]; then
-		echo $PROP
-	else
-		echo "null"
-	fi
-}
+VER=$(awk -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop) 
 
 # set busybox variables
 MKDIR="${BUSYBOX} mkdir"
@@ -59,8 +62,13 @@ fi
 # Check recovery-boot file
 if [ ! -e /cache/recovery/boot ];then
 
-        # Trigger Blue LED
+        # Trigger BOTH Blue LEDs
         echo 255 > ${B_LED}
+		echo 0x5 > ${set0}
+		echo 0xFF > ${set6}
+		echo 0x3B > ${set8}
+		echo 0x11 > ${set4}
+		# set4 must be last always, don't ask why
 
         for EVENTDEV in $(${LS} /dev/input/event* )
 		do
@@ -87,7 +95,7 @@ if [ ! -e /cache/recovery/boot ];then
 fi
 
 #Check if we need to kill SElinux :]
-ANDROIDVER=`${BUSYBOX} echo "$(GETPROP ro.build.version.release) 5.1.1" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
+ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
 if [ "$ANDROIDVER" = "lollipop" ]; then
 	if [ -e "/system/lib/modules/byeselinux.ko" ]; then
 		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
@@ -97,8 +105,12 @@ fi
 # PhilZ
 if [ -s ${WORKDIR}/keycheck_down ]; then
 
-        # turn LED Purple
+        # turn BOTH LEDs Purple
 		echo 255 > ${R_LED}
+		echo 0xDB > ${set6}
+		echo 0xFF > ${set7}
+		echo 0x0 > ${set8}
+		echo 0x5 > ${set4}
 
         # copy everything to /sbin
 		${CP} /system/xbin/busybox /sbin/busybox
@@ -122,9 +134,13 @@ fi
 # TWRP
 if [ -s ${WORKDIR}/keycheck_up ]; then
 
-        # turn LED Green 
+        # turn BOTH LEDs Green 
         echo 0 > ${B_LED}
 		echo 255 > ${G_LED}
+		echo 0xF > ${set6}
+		echo 0xFF > ${set7}
+		echo 0xFF > ${set8}
+		echo 0x11 > ${set4}
 
         # copy everything to /sbin
 		${CP} /system/xbin/busybox /sbin/busybox
@@ -148,10 +164,14 @@ fi
 # CWM
 if [ -s ${WORKDIR}/keycheck_camera ] || [ -s ${WORKDIR}/keycheck_camera2 ]; then
 
-        # turn LED White
+        # turn BOTH LEDs White
         echo 255 > ${B_LED}
 	    echo 255 > ${G_LED}
 	    echo 255 > ${R_LED}
+		echo 0xFF > ${set6}
+		echo 0xFF > ${set7}
+		echo 0xFF > ${set8}
+		echo 0x15 > ${set4}
 
         # copy everything to /sbin
 	    ${CP} /system/xbin/busybox /sbin/busybox
@@ -176,6 +196,12 @@ fi
 echo 0 > ${B_LED}
 echo 0 > ${R_LED}
 echo 0 > ${G_LED}
+echo 0x0 > ${set0}
+echo 0x0 > ${set6}
+echo 0x0 > ${set7}
+echo 0x0 > ${set8}
+echo 0x0 > ${set4}
+
 
 ${BUSYBOX} touch /dev/recoverycheck
 
