@@ -48,6 +48,11 @@ ${BUSYBOX} sync
 echo 0 > /sys/class/leds/rgb_blue/brightness
 echo 0 > /sys/class/leds/rgb_red/brightness
 echo 0 > /sys/class/leds/rgb_green/brightness
+echo 0x0 > /sys/class/illumination/0
+echo 0x0 > /sys/class/illumination/6
+echo 0x0 > /sys/class/illumination/7
+echo 0x0 > /sys/class/illumination/8
+echo 0x0 > /sys/class/illumination/4
 
 # cd to root fs
 cd /

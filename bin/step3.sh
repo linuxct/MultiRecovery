@@ -1,20 +1,13 @@
 #!/data/local/tmp/recovery/busybox sh
 
 BUSYBOX=/data/local/tmp/recovery/busybox
-GETPROP() {
-	PROP=$(${BUSYBOX} grep "$VAR" /system/build.prop | ${BUSYBOX} awk -F'=' '{ print $NF }')
-	if [ "$VAR" != "" -a "$PROP" != "" ]; then
-		echo $PROP
-	else
-		echo "null"
-	fi
-}
+VER=$(awk -F='/ro\.build\.version\.release/{print $NF}' /system/build.prop)
 
 echo "remount /system writable"
 ${BUSYBOX} mount -o remount,rw /system
 
 # Checking android version first, because byeselinux is causing issues with android versions older then lollipop.
-ANDROIDVER=`${BUSYBOX} echo "$(GETPROP ro.build.version.release) 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
+ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
 if [ "$ANDROIDVER" = "lollipop" ]; then
 	# Thanks to zxz0O0 for this method
 	if [ ! -e "/system/lib/modules/byeselinux.ko" ]; then
@@ -31,7 +24,7 @@ if [ "$ANDROIDVER" = "lollipop" ]; then
 			${BUSYBOX} chmod 755 /data/local/tmp/recovery/byeselinux.sh
 			/data/local/tmp/recovery/byeselinux.sh
 		else
-			echo "the module is accepted!"
+			echo "!! the module is accepted !!"
 		fi
 		/system/bin/rmmod byeselinux
 	fi
@@ -50,12 +43,23 @@ ${BUSYBOX} chmod 644 /system/bin/philz.cpio
 ${BUSYBOX} cp /data/local/tmp/recovery/cwm.cpio /system/bin/cwm.cpio
 ${BUSYBOX} chmod 644 /system/bin/cwm.cpio
 
-echo "copy chargemon replacement to system."
-if [ ! -f "/system/bin/chargemon.bin" ]; then
-	${BUSYBOX} mv /system/bin/chargemon /system/bin/chargemon.bin
+if [ "$ANDROIDVER" = "other" ]; then
+	echo "copy e2fsck replacement to system."
+	if [ ! -f "/system/bin/e2fsck.bin" ]; then
+		${BUSYBOX} mv /system/bin/e2fsck /system/bin/e2fsck.bin
+	fi
+	${BUSYBOX} cp /data/local/tmp/recovery/e2fsck.sh /system/bin/e2fsck
+	${BUSYBOX} chmod 755 /system/bin/e2fsck
 fi
-${BUSYBOX} cp /data/local/tmp/recovery/chargemon.sh /system/bin/chargemon
-${BUSYBOX} chmod 755 /system/bin/chargemon
+
+if [ "$ANDROIDVER" = "lollipop" ]; then
+	echo "copy chargemon replacement to system."
+	if [ ! -f "/system/bin/chargemon.bin" ]; then
+		${BUSYBOX} mv /system/bin/chargemon /system/bin/chargemon.bin
+	fi
+	${BUSYBOX} cp /data/local/tmp/recovery/chargemon.sh /system/bin/chargemon
+	${BUSYBOX} chmod 755 /system/bin/chargemon
+fi
 
 echo "copy recovery script to system."
 ${BUSYBOX} cp /data/local/tmp/recovery/recovery.sh /system/bin/recovery.sh
