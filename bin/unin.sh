@@ -2,22 +2,22 @@
 BUSYBOX=/data/local/tmp/recovery/busybox
 ${BUSYBOX} mount -o remount,rw /system
 
-# remove cwm
+# Remove cwm
 if [ -e /system/bin/cwm.cpio ]; then
     ${BUSYBOX} rm /system/bin/cwm.cpio
 fi
 
-# remove twrp
+# Remove twrp
 if [ -e /system/bin/twrp.cpio ]; then
     ${BUSYBOX} rm /system/bin/twrp.cpio
 fi
 
-# remove philz
+# Remove philz
 if [ -e /system/bin/philz.cpio ]; then
     ${BUSYBOX} rm /system/bin/philz.cpio
 fi
 
-#old
+# Remove old archives
 if [ -e /system/bin/recovery.cpio ]; then
     ${BUSYBOX} rm /system/bin/recovery.cpio
 fi
