@@ -24,6 +24,8 @@ WORKDIR="/cache/multirecovery"
 # Get Android version
 VER=$(${BUSYBOX} awk -F= '/ro.build.version.release/{print $NF}' /system/build.prop)
 ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
+LP="lollipop"
+KK="other"
 
 # Predefined applet names
 MKDIR="${BUSYBOX} mkdir"
@@ -102,8 +104,8 @@ if [ ! -e /cache/recovery/boot ];then
 		${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORKDIR}/keycheck_camera2
 fi
 
-# Check if we need to kill SElinux :]
-if [ "$ANDROIDVER" = "lollipop" ]; then
+# Check if we need to change SELinux modes
+if [ "$ANDROIDVER" == "lollipop" ]; then
 	if [ -e "/system/lib/modules/byeselinux.ko" ]; then
 		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
 	fi
@@ -188,7 +190,7 @@ if [ -s ${WORKDIR}/keycheck_camera ] || [ -s ${WORKDIR}/keycheck_camera2 ]; then
         echo 0xFF > ${set8}
         echo 0x15 > ${set4}
 
-        # copy everything to /sbin
+        # Copy everything to /sbin
         ${CP} /system/xbin/busybox /sbin/busybox
         ${CHOWN} 0.2000 /sbin/busybox
         ${CHMOD}755 /sbin/busybox
@@ -222,21 +224,20 @@ echo 0x0 > ${set4}
 
 ${BUSYBOX} touch /dev/recoverycheck
 
-if [ "$ANDROIDVER" = "lollipop" ]; then
-        # Remove SElinux LKM
-        /system/bin/rmmod byeselinux
+if [ "$ANDROIDVER" == "$LP" ]; then
+        /system/bin/rmmod byeselinux # Remove byeselinux LKM
 fi
 
 fi
 
-if [ "$ANDROIDVER" = "lollipop" ]; then
+if [ "$ANDROIDVER" == "$LP" ]; then
         FILENAME="chargemon"
 fi
 
-if [ "$ANDROIDVER" = "other" ]; then
+if [ "$ANDROIDVER" == "$KK" ]; then
         FILENAME="e2fsck"
 fi
 
 
-# Continue regular boot (run stock script)
+# Continue regular boot (run stock binary)
 /system/bin/${FILENAME}.bin $*

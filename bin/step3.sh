@@ -2,15 +2,17 @@
 
 BUSYBOX=/data/local/tmp/recovery/busybox
 
+LP="lollipop"
+KK="other"
 AWK="${BUSYBOX} awk"
-VER=$(${AWK} -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop) 
+VER=$(${AWK} -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop)
 
 echo "remount /system writable"
 ${BUSYBOX} mount -o remount,rw /system
 
 # Checking android version first, because byeselinux is causing issues with android versions older than lollipop.
 ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
-if [ "$ANDROIDVER" = "lollipop" ]; then
+if [ "$ANDROIDVER" == "$LP" ]; then
 	# Thanks to zxz0O0 for this method
         if [ ! -e "/system/lib/modules/byeselinux.ko" ]; then
                 echo "the byeselinux module does not yet exist, installing it now."
@@ -50,7 +52,7 @@ ${BUSYBOX} cp /data/local/tmp/recovery/cwm.cpio /system/bin/cwm.cpio
 ${BUSYBOX} chown 0.0 /system/bin/cwm.cpio
 ${BUSYBOX} chmod 644 /system/bin/cwm.cpio
 
-if [ "$ANDROIDVER" = "other" ]; then
+if [ "$ANDROIDVER" == "$KK" ]; then
         echo "copy e2fsck replacement to system."
         if [ ! -f "/system/bin/e2fsck.bin" ]; then
                 ${BUSYBOX} mv /system/bin/e2fsck /system/bin/e2fsck.bin
@@ -60,7 +62,7 @@ if [ "$ANDROIDVER" = "other" ]; then
         ${BUSYBOX} chmod 755 /system/bin/e2fsck
 fi
 
-if [ "$ANDROIDVER" = "lollipop" ]; then
+if [ "$ANDROIDVER" == "$LP" ]; then
         echo "copy chargemon replacement to system."
         if [ ! -f "/system/bin/chargemon.bin" ]; then
 		${BUSYBOX} mv /system/bin/chargemon /system/bin/chargemon.bin
