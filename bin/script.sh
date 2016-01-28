@@ -21,12 +21,6 @@ set8=/sys/class/illumination/8
 
 WORKDIR="/cache/multirecovery"
 
-# Get Android version
-VER=$(${BUSYBOX} awk -F= '/ro.build.version.release/{print $NF}' /system/build.prop)
-ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
-LP="lollipop"
-KK="other"
-
 # Predefined applet names
 MKDIR="${BUSYBOX} mkdir"
 CHOWN="${BUSYBOX} chown"
@@ -44,6 +38,34 @@ MOUNT="${BUSYBOX} mount"
 LS="${BUSYBOX} ls"
 HEXDUMP="${BUSYBOX} hexdump"
 CP="${BUSYBOX} cp"
+
+# function to detect the installed Android version
+OS_VERSION ()
+{
+	VERSION="jb_other"
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "5.1.1")" -eq 1 ]; then
+		VERSION="5.1.1" # 18.6.A.0.X
+		VER_LP=true
+	else
+		VER_LP=false
+	fi
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "4.4.4")" -eq 1 ]; then
+		VERSION="4.4.4" # 18.3.1.X.X
+		VER_KK4=true
+	else
+		VER_KK4=false
+	fi
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "4.3")" -eq 1 ]; then
+		VERSION="4.3" # 18.0.C.1.13
+		VER_KK3=true
+	else
+		VER_KK3=false
+	fi
+
+}
 
 if [ ! -f /dev/recoverycheck ]; then
 
@@ -68,7 +90,7 @@ if [ ! -e ${WORKDIR}/keycheck ]; then
 fi
 
 # Check recovery-boot file
-if [ ! -e /cache/recovery/boot ];then
+if [ ! -e /cache/recovery/boot ]; then
 
         # Trigger BOTH Blue LEDs
         echo 255 > ${B_LED}
@@ -104,8 +126,9 @@ if [ ! -e /cache/recovery/boot ];then
 		${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORKDIR}/keycheck_camera2
 fi
 
+OS_VERSION
 # Check if we need to change SELinux modes
-if [ "$ANDROIDVER" == "lollipop" ]; then
+if ${VER_LP} ; then
 	if [ -e "/system/lib/modules/byeselinux.ko" ]; then
 		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
 	fi
@@ -224,20 +247,15 @@ echo 0x0 > ${set4}
 
 ${BUSYBOX} touch /dev/recoverycheck
 
-if [ "$ANDROIDVER" == "$LP" ]; then
-        /system/bin/rmmod byeselinux # Remove byeselinux LKM
+
+if ${VER_KK4} || ${VER_KK3} ; then
+    FILENAME="e2fsck"
+else
+    FILENAME="chargemon"
+    /system/bin/rmmod byeselinux
 fi
 
-fi
-
-if [ "$ANDROIDVER" == "$LP" ]; then
-        FILENAME="chargemon"
-fi
-
-if [ "$ANDROIDVER" == "$KK" ]; then
-        FILENAME="e2fsck"
-fi
-
+fi # end of recoverycheck statement
 
 # Continue regular boot (run stock binary)
 /system/bin/${FILENAME}.bin $*

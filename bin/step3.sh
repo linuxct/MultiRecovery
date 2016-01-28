@@ -1,18 +1,54 @@
 #!/data/local/tmp/recovery/busybox sh
 
 BUSYBOX=/data/local/tmp/recovery/busybox
+CAT="${BUSYBOX} cat"
+GREP="${BUSYBOX} grep"
 
-LP="lollipop"
-KK="other"
-AWK="${BUSYBOX} awk"
-VER=$(${AWK} -F= '/ro\.build\.version\.release/{print $NF}' /system/build.prop)
+OS_VERSION ()
+{
+	VERSION="jb_other"
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "5.1.1")" -eq 1 ]; then
+		VERSION="5.1.1" # 18.6.A.0.X
+		VER_LP=true
+	else
+		VER_LP=false
+	fi
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "4.4.4")" -eq 1 ]; then
+		VERSION="4.4.4" # 18.3.1.X.X
+		VER_KK4=true
+	else
+		VER_KK4=false
+	fi
+
+	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "4.3")" -eq 1 ]; then
+		VERSION="4.3" # 18.0.C.1.13
+		VER_KK3=true
+	else
+		VER_KK3=false
+	fi
+
+}
+
+OS_VERSION
+echo "Getting version number "
+if [ "$VERSION" = '5.1.1' ]; then
+     echo "Android :" ${VERSION}
+elif [ "$VERSION" = '4.4.4' ]; then
+     echo "Android :" ${VERSION}
+elif [ "$VERSION" = '4.3' ]; then
+     echo "Android :" ${VERSION}
+else
+    echo "Version  is  ${VERSION}  NOT compatible "
+    exit 1;
+fi
 
 echo "remount /system writable"
 ${BUSYBOX} mount -o remount,rw /system
 
-# Checking android version first, because byeselinux is causing issues with android versions older than lollipop.
-ANDROIDVER=`${BUSYBOX} echo "$VER 5.0.0" | ${BUSYBOX} awk '{if ($2 != "" && $1 >= $2) print "lollipop"; else print "other"}'`
-if [ "$ANDROIDVER" == "$LP" ]; then
+# Checking android version first, because we not using byeselinux on android versions older than lollipop.
+if [ "$VERSION" = "5.1.1" ]; then
 	# Thanks to zxz0O0 for this method
         if [ ! -e "/system/lib/modules/byeselinux.ko" ]; then
                 echo "the byeselinux module does not yet exist, installing it now."
@@ -52,7 +88,7 @@ ${BUSYBOX} cp /data/local/tmp/recovery/cwm.cpio /system/bin/cwm.cpio
 ${BUSYBOX} chown 0.0 /system/bin/cwm.cpio
 ${BUSYBOX} chmod 644 /system/bin/cwm.cpio
 
-if [ "$ANDROIDVER" == "$KK" ]; then
+if ${VER_KK4} || ${VER_KK3} ; then
         echo "copy e2fsck replacement to system."
         if [ ! -f "/system/bin/e2fsck.bin" ]; then
                 ${BUSYBOX} mv /system/bin/e2fsck /system/bin/e2fsck.bin
@@ -62,7 +98,7 @@ if [ "$ANDROIDVER" == "$KK" ]; then
         ${BUSYBOX} chmod 755 /system/bin/e2fsck
 fi
 
-if [ "$ANDROIDVER" == "$LP" ]; then
+if [ "$VERSION" = "5.1.1" ]; then
         echo "copy chargemon replacement to system."
         if [ ! -f "/system/bin/chargemon.bin" ]; then
 		${BUSYBOX} mv /system/bin/chargemon /system/bin/chargemon.bin

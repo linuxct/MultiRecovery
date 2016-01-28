@@ -6,6 +6,7 @@ LOCAL_DIR=`dirname $0`
 LOCAL_NAME=adb
 ADB=${LOCAL_DIR}/${LOCAL_NAME}
 ADBB=../$ADB
+chmod u+x adb
 
 adb_exists ()
 {
@@ -57,10 +58,9 @@ function doInstall ()
     $ADBB shell "rm -r /data/local/tmp/recovery"
 
     if [ $? -eq 0 ]; then
-	printf "Thank you for installing your MultiRecovery \nEnjoy...\n"
+	printf "Installation done \nEnjoy...\n"
     else
         printf "Installation failed!\n"
-        exit 1;
     fi
 
 }
@@ -80,10 +80,9 @@ function doRemove ()
     $ADBB shell "rm -r /data/local/tmp/recovery"
 	
     if [ $? -eq 0 ]; then
-	printf "Uninstalling done\n"
+	printf "Uninstall done\n"
     else
-        printf "Uninstalling failed!\n"
-        exit 1;
+        printf "Uninstall failed!\n"
     fi
 
 }
