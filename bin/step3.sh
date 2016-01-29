@@ -1,4 +1,4 @@
-#!/data/local/tmp/recovery/busybox sh
+#!/system/bin/sh
 
 BUSYBOX=/data/local/tmp/recovery/busybox
 CAT="${BUSYBOX} cat"

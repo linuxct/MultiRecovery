@@ -1,4 +1,4 @@
-#!/system/xbin/busybox sh
+#!/system/bin/sh
 
 # Set variable paths
 BUSYBOX=/system/xbin/busybox
@@ -246,16 +246,17 @@ echo 0x0 > ${set8}
 echo 0x0 > ${set4}
 
 ${BUSYBOX} touch /dev/recoverycheck
-
-
-if ${VER_KK4} || ${VER_KK3} ; then
-    FILENAME="e2fsck"
-else
-    FILENAME="chargemon"
-    /system/bin/rmmod byeselinux
-fi
+${BUSYBOX} touch ${WORKDIR}/keycheck
 
 fi # end of recoverycheck statement
 
 # Continue regular boot (run stock binary)
-/system/bin/${FILENAME}.bin $*
+if ${VER_KK4} || ${VER_KK3} ; then
+    /system/bin/e2fsck.bin $*
+else
+    if [ -e "/system/lib/modules/byeselinux.ko" ]; then
+	${BUSYBOX} rmmod /system/lib/modules/byeselinux.ko
+    fi
+    /system/bin/chargemon.bin $*
+fi
+
