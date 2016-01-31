@@ -1,0 +1,22 @@
+Recovery Options:
+1. CWM 6.0.5.1
+2. Philz touch 6.59.0
+3. TWRP 2.8.1.0
+
+Requirements:
+. Installed ADB Interface Driver
+. Rooted Xperia M2 phone
+. Locked bootloader
+. Stock firmware 18.0.C.1.13 or above
+
+Installation:
+. Extract package to your pc.
+. Run the script to install the recovery.
+
+To enter recovery, press the appropriate button on boot when the cyan led glows.
+. Volume Down   - Philz
+. Volume UP     - TWRP
+. Camera button - CWM
+
+Credits:
+DooMLoRD, Rachit Rawat, [NUT], Phil3759, Team Win Recovery Project, zxz0O0
