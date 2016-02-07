@@ -36,7 +36,7 @@ echo Device Detected.
 echo.
 
 :menu
-echo 1. Install MultiRecovery v0.8 (Android 4.3/4.4.x/5.1.1)
+echo 1. Install MultiRecovery v0.9 (Android 4.3/4.4.x/5.1.1)
 echo 2. Uninstall MultiRecovery
 echo 3. Exit
 
@@ -57,9 +57,9 @@ adb push dummy.sh /data/local/tmp/recovery
 adb push twrp/twrp.cpio /data/local/tmp/recovery
 adb push philz/philz.cpio /data/local/tmp/recovery
 adb push cwm/cwm.cpio /data/local/tmp/recovery
-adb push byeselinux/byeselinux.ko /data/local/tmp/recovery
-adb push byeselinux/byeselinux.sh /data/local/tmp/recovery
-adb push byeselinux/modulecrcpatch /data/local/tmp/recovery
+adb push selinuxchnger/selinux_mod.ko /data/local/tmp/recovery
+adb push selinuxchnger/selinux_mod.sh /data/local/tmp/recovery
+adb push selinuxchnger/copymodulecrc /data/local/tmp/recovery
 adb push busybox /data/local/tmp/recovery
 adb push step3.sh /data/local/tmp/recovery
 adb shell "chmod 755 /data/local/tmp/recovery/busybox"

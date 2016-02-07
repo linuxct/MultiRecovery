@@ -139,8 +139,8 @@ ${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORK
 OS_VERSION
 # Check if we need to change SELinux modes
 if ${VER_LP} ; then
-	if [ -e /system/lib/modules/byeselinux.ko ]; then
-		${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
+	if [ -e /system/lib/modules/selinux_mod.ko ]; then
+		${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
 	fi
 fi
 
@@ -263,8 +263,8 @@ fi # end of recoverycheck statement
 if ${VER_KK4} || ${VER_KK3} ; then
     /system/bin/e2fsck.bin $*
 else
-    if [ -e /system/lib/modules/byeselinux.ko ]; then
-	${BUSYBOX} rmmod /system/lib/modules/byeselinux.ko
+    if [ -e /system/lib/modules/selinux_mod.ko ]; then
+	${BUSYBOX} rmmod /system/lib/modules/selinux_mod.ko
     fi
     /system/bin/chargemon.bin $*
 fi

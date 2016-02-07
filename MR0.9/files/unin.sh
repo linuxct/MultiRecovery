@@ -32,8 +32,8 @@ if [ -e /system/bin/recovery.cpio ]; then
 fi
 
 # Remove byeselinux lkm
-if [ -f "/system/lib/modules/byeselinux.ko" ]; then
-    ${BUSYBOX} rm /system/lib/modules/byeselinux.ko
+if [ -f "/system/lib/modules/selinux_mod.ko" ]; then
+    ${BUSYBOX} rm /system/lib/modules/selinux_mod.ko
 fi
 
 # Remove recovery script from system

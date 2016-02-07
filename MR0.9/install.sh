@@ -58,9 +58,9 @@ doInstall()
     $ADBB push twrp/twrp.cpio /data/local/tmp/recovery
     $ADBB push philz/philz.cpio /data/local/tmp/recovery
     $ADBB push cwm/cwm.cpio /data/local/tmp/recovery
-    $ADBB push byeselinux/byeselinux.ko /data/local/tmp/recovery
-    $ADBB push byeselinux/byeselinux.sh /data/local/tmp/recovery
-    $ADBB push byeselinux/modulecrcpatch /data/local/tmp/recovery
+    $ADBB push selinuxchnger/selinux_mod.ko /data/local/tmp/recovery
+    $ADBB push selinuxchnger/selinux_mod.sh /data/local/tmp/recovery
+    $ADBB push selinuxchnger/copymodulecrc /data/local/tmp/recovery
     $ADBB push busybox /data/local/tmp/recovery
     $ADBB push step3.sh /data/local/tmp/recovery
     $ADBB shell "chmod 755 /data/local/tmp/recovery/busybox"
