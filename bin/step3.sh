@@ -1,13 +1,24 @@
 #!/system/bin/sh
 
-BUSYBOX=/data/local/tmp/recovery/busybox
-CAT="${BUSYBOX} cat"
-GREP="${BUSYBOX} grep"
+if [ -x "/system/xbin/busybox" ]; then
+   BUSYBOX="/system/xbin/busybox"
+elif [ -x "/system/bin/busybox" ]; then
+   BUSYBOX="/system/bin/busybox"
+else
+   BUSYBOX=/data/local/tmp/recovery/busybox
+fi
+
+SET_ALIAS ()
+{
+   CAT="${BUSYBOX} cat"
+   GREP="${BUSYBOX} grep"
+}
 
 OS_VERSION ()
 {
 	VERSION="jb_other"
 
+        SET_ALIAS
 	if [ "$(${CAT} /system/build.prop | ${GREP} "ro.build.version.release" | ${GREP} -c "5.1.1")" -eq 1 ]; then
 		VERSION="5.1.1" # 18.6.A.0.X
 		VER_LP=true
@@ -47,26 +58,26 @@ fi
 echo "remount /system writable"
 ${BUSYBOX} mount -o remount,rw /system
 
-# Checking android version first, because we not using byeselinux on android versions older than lollipop.
+# Checking version first, because we not using this module on Android older than lollipop.
 if [ "$VERSION" = "5.1.1" ]; then
 	# Thanks to zxz0O0 for this method
-        if [ ! -e "/system/lib/modules/byeselinux.ko" ]; then
-                echo "the byeselinux module does not yet exist, installing it now."
-                ${BUSYBOX} chmod 755 /data/local/tmp/recovery/byeselinux.sh
-                ${BUSYBOX} chmod 755 /data/local/tmp/recovery/modulecrcpatch
-                /data/local/tmp/recovery/byeselinux.sh
+        if [ ! -e "/system/lib/modules/selinux_mod.ko" ]; then
+                echo "SELinux module changer does not yet exist, installing it now."
+                ${BUSYBOX} chmod 755 /data/local/tmp/recovery/selinux_mod.sh
+                ${BUSYBOX} chmod 755 /data/local/tmp/recovery/copymodulecrc
+                /data/local/tmp/recovery/selinux_mod.sh
 	else
-                echo "the byeselinux module exists, testing if the kernel accepts it."
-                ${BUSYBOX} insmod /system/lib/modules/byeselinux.ko
+                echo "SELinux module changer exists, testing if the kernel accepts it."
+                ${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
 		if [ "$?" != "0" -a "$?" != "17" ]; then
 			echo "that module is not accepted by the running kernel, will replace it now."
-			${BUSYBOX} chmod 755 /data/local/tmp/recovery/modulecrcpatch
-			${BUSYBOX} chmod 755 /data/local/tmp/recovery/byeselinux.sh
-			/data/local/tmp/recovery/byeselinux.sh
+			${BUSYBOX} chmod 755 /data/local/tmp/recovery/copymodulecrc
+			${BUSYBOX} chmod 755 /data/local/tmp/recovery/selinux_mod.sh
+			/data/local/tmp/recovery/selinux_mod.sh
 		else
 			echo "!! the module is accepted !!"
 		fi
-		/system/bin/rmmod byeselinux
+		#/system/bin/rmmod selinux_mod.ko
 	fi
 fi
 
@@ -93,7 +104,7 @@ if ${VER_KK4} || ${VER_KK3} ; then
         if [ ! -f "/system/bin/e2fsck.bin" ]; then
                 ${BUSYBOX} mv /system/bin/e2fsck /system/bin/e2fsck.bin
 	fi
-        ${BUSYBOX} cp /data/local/tmp/recovery/script.sh /system/bin/e2fsck
+        ${BUSYBOX} cp /data/local/tmp/recovery/dummy.sh /system/bin/e2fsck
         ${BUSYBOX} chown 0.0 /system/bin/e2fsck
         ${BUSYBOX} chmod 755 /system/bin/e2fsck
 fi
@@ -103,7 +114,7 @@ if [ "$VERSION" = "5.1.1" ]; then
         if [ ! -f "/system/bin/chargemon.bin" ]; then
 		${BUSYBOX} mv /system/bin/chargemon /system/bin/chargemon.bin
         fi
-        ${BUSYBOX} cp /data/local/tmp/recovery/script.sh /system/bin/chargemon
+        ${BUSYBOX} cp /data/local/tmp/recovery/dummy.sh /system/bin/chargemon
         ${BUSYBOX} chown 0.0 /system/bin/chargemon
         ${BUSYBOX} chmod 755 /system/bin/chargemon
 fi
@@ -112,6 +123,7 @@ echo "copy recovery script to system."
 ${BUSYBOX} cp /data/local/tmp/recovery/recovery.sh /system/bin/recovery.sh
 ${BUSYBOX} chown 0.0 /system/bin/recovery.sh
 ${BUSYBOX} chmod 755 /system/bin/recovery.sh
+
 
 echo "remount /system read only"
 ${BUSYBOX} mount -o remount,ro /system

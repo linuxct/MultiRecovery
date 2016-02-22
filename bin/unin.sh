@@ -1,6 +1,13 @@
-#!/data/local/tmp/recovery/busybox sh
+#!/system/bin/sh
 
-BUSYBOX=/data/local/tmp/recovery/busybox
+# Initialize Busybox path
+if [ -x "/system/xbin/busybox" ]; then
+  BUSYBOX="/system/xbin/busybox"
+elif [ -x "/system/bin/busybox" ]; then
+  BUSYBOX="/system/bin/busybox"
+else
+  BUSYBOX="/data/local/tmp/recovery/busybox"
+fi
 
 ${BUSYBOX} mount -o remount,rw /system
 
@@ -25,8 +32,8 @@ if [ -e /system/bin/recovery.cpio ]; then
 fi
 
 # Remove byeselinux lkm
-if [ -f "/system/lib/modules/byeselinux.ko" ]; then
-    ${BUSYBOX} rm /system/lib/modules/byeselinux.ko
+if [ -f "/system/lib/modules/selinux_mod.ko" ]; then
+    ${BUSYBOX} rm /system/lib/modules/selinux_mod.ko
 fi
 
 # Remove recovery script from system
@@ -36,11 +43,18 @@ fi
 
 # Restore chargemon & e2fsck binary files
 if [ -e /system/bin/chargemon.bin ]; then
-   ${BUSYBOX} mv /system/bin/chargemon.bin /system/bin/chargemon
+   CHARGEMON=`${BUSYBOX} sed -n 1p /system/bin/chargemon`
+   if [ "${CHARGEMON}" = "#!/system/bin/sh" ]; then
+       ${BUSYBOX} mv /system/bin/chargemon.bin /system/bin/chargemon
+   fi
 fi
 
+
 if [ -e /system/bin/e2fsck.bin ]; then
-   ${BUSYBOX} mv /system/bin/e2fsck.bin /system/bin/e2fsck
+   E2FSCK=`${BUSYBOX} sed -n 1p /system/bin/e2fsck`
+   if [ "${E2FSCK}" = "#!/system/bin/sh" ]; then
+      ${BUSYBOX} mv /system/bin/e2fsck.bin /system/bin/e2fsck
+   fi
 fi
 
 ${BUSYBOX} mount -o remount,ro /system

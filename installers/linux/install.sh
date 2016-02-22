@@ -8,12 +8,23 @@ ADB=${LOCAL_DIR}/${LOCAL_NAME}
 ADBB=../$ADB
 chmod u+x adb
 
-adb_exists ()
+app_exists()
 {
     type "$1" &> /dev/null ;
 }
 
-function baner ()
+openurl()
+{
+   if app_exists xdg-open ; then
+      xdg-open "$1"
+   elif app_exists gnome-open ; then
+      gnome-open "$1"
+   else
+       echo "Couldn't detect the web browser to use."
+   fi
+}
+
+baner()
 {
     printf " ============================================ \n"
     printf " |    *** MultiRecovery Installer ***       | \n"
@@ -27,7 +38,7 @@ function baner ()
     printf " ===========================================\n"
 }
 
-function doAdb ()
+doAdb()
 {
     $ADB kill-server
     $ADB start-server
@@ -35,7 +46,7 @@ function doAdb ()
     cd files
 }
 
-function doInstall ()
+doInstall()
 {
     printf "===============================================\n"
     printf "          Installing MultiRecovery             \n"
@@ -43,13 +54,13 @@ function doInstall ()
         
     $ADBB shell "mkdir /data/local/tmp/recovery"
     $ADBB push recovery.sh /data/local/tmp/recovery
-    $ADBB push script.sh /data/local/tmp/recovery
+    $ADBB push dummy.sh /data/local/tmp/recovery
     $ADBB push twrp/twrp.cpio /data/local/tmp/recovery
     $ADBB push philz/philz.cpio /data/local/tmp/recovery
     $ADBB push cwm/cwm.cpio /data/local/tmp/recovery
-    $ADBB push byeselinux/byeselinux.ko /data/local/tmp/recovery
-    $ADBB push byeselinux/byeselinux.sh /data/local/tmp/recovery
-    $ADBB push byeselinux/modulecrcpatch /data/local/tmp/recovery
+    $ADBB push selinuxchnger/selinux_mod.ko /data/local/tmp/recovery
+    $ADBB push selinuxchnger/selinux_mod.sh /data/local/tmp/recovery
+    $ADBB push selinuxchnger/copymodulecrc /data/local/tmp/recovery
     $ADBB push busybox /data/local/tmp/recovery
     $ADBB push step3.sh /data/local/tmp/recovery
     $ADBB shell "chmod 755 /data/local/tmp/recovery/busybox"
@@ -65,7 +76,7 @@ function doInstall ()
 
 }
 
-function doRemove ()
+doRemove()
 {
     printf "===============================================\n"
     printf "          Uninstalling MultiRecovery\n         \n"
@@ -89,8 +100,8 @@ function doRemove ()
 
 baner
 
-if adb_exists adb ; then
-    printf "Required adb is installed..."
+if app_exists adb ; then
+    printf "Required adb is installed...\n"
     ADB=adb
     ADBB=$ADB
 fi
@@ -98,15 +109,19 @@ fi
 doAdb
 
 PS3='Enter your choice: '
-options=("Install MultiRecovery v0.8 (Android 4.3/4.4.x/5.1.1)" "Uninstall MultiRecovery" "Quit")
+options=("Install MultiRecovery (Android 4.3/4.4.x/5.1.1)" "Uninstall MultiRecovery" "View xda thread" "Quit")
 select opt in "${options[@]}"
 do
     case $opt in
-        "Install MultiRecovery v0.8 (Android 4.3/4.4.x/5.1.1)")
+        "Install MultiRecovery (Android 4.3/4.4.x/5.1.1)")
             doInstall
             ;;
         "Uninstall MultiRecovery")
             doRemove
+            ;;
+        "View xda thread")
+            openurl 'http://forum.xda-developers.com/xperia-m2/development/d2303-philz-touch-recovery-6-t3047492'
+            break
             ;;
         "Quit")
             break
