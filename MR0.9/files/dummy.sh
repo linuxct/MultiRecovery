@@ -29,7 +29,7 @@ set8=/sys/class/illumination/8
 WORKDIR="/cache/multirecovery"
 
 # Predefined applet names
-SET_ALIAS ()
+SET_ALIASES ()
 {
   if [ -n "${BUSYBOX}" ] ; then
      MKDIR="${BUSYBOX} mkdir"
@@ -81,7 +81,8 @@ OS_VERSION ()
 
 if [ ! -f /dev/recoverycheck -a -n "${BUSYBOX}" ]; then
 
-SET_ALIAS
+SET_ALIASES
+
 # Remount rootfs rw
 ${MOUNT} -o remount,rw rootfs /
 
@@ -263,9 +264,6 @@ fi # end of recoverycheck statement
 if ${VER_KK4} || ${VER_KK3} ; then
     /system/bin/e2fsck.bin $*
 else
-    if [ -e /system/lib/modules/selinux_mod.ko ]; then
-	${BUSYBOX} rmmod /system/lib/modules/selinux_mod.ko
-    fi
-    /system/bin/chargemon.bin $*
+    exec /system/bin/chargemon.bin # no external arguments here? execute chargemon program.
 fi
 

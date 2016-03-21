@@ -26,13 +26,13 @@ openurl()
 
 baner()
 {
-    printf " ============================================ \n"
-    printf " |    *** MultiRecovery Installer ***       | \n"
-    printf " |         for Xperia M2 (& M2 Aqua)        | \n"
-    printf " |      by AlexJ, Andrej732 & LinuxCT       | \n"
-    printf " |   Based on NUT's and Rachit Rawat work   | \n"
     printf " =========================================== \n"
-    printf "\n"
+    printf " |                                          |\n"
+    printf " |    *** MultiRecovery Installer ***       |\n"
+    printf " |         for Xperia M2 (& M2 Aqua)        |\n"
+    printf " |                                          |\n"
+    printf " ===========================================\n"
+
     printf " ===========================================\n"
     printf "  Connect Xperia M2 with USB debugging on.. \n"
     printf " ===========================================\n"

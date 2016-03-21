@@ -44,15 +44,15 @@ fi
 # Restore chargemon & e2fsck binary files
 if [ -e /system/bin/chargemon.bin ]; then   
    CHARGEMON=`${BUSYBOX} sed -n 1p /system/bin/chargemon`
-   if [ "${CHARGEMON}" = "#!/system/bin/sh" ]; then
+   if [ "${CHARGEMON}" = "#!/system/bin/sh" ] || [ "${CHARGEMON}" = "#!/system/xbin/busybox sh" ]; then
        ${BUSYBOX} mv /system/bin/chargemon.bin /system/bin/chargemon
    fi   
 fi
 
-
+# Don't touch if it isn't a shell script
 if [ -e /system/bin/e2fsck.bin ]; then
-   E2FSCK=`${BUSYBOX} sed -n 1p /system/bin/e2fsck`
-   if [ "${E2FSCK}" = "#!/system/bin/sh" ]; then
+   E2FSCK=`${BUSYBOX} sed -n 1p /system/bin/e2fsck` # double checks if e2fsck is not a binary..
+   if [ "${E2FSCK}" = "#!/system/bin/sh" ] || [ "${E2FSCK}" = "#!/system/xbin/busybox sh" ]; then
       ${BUSYBOX} mv /system/bin/e2fsck.bin /system/bin/e2fsck
    fi
 fi
