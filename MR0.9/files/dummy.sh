@@ -139,10 +139,14 @@ ${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORK
 
 OS_VERSION
 # Check if we need to change SELinux modes
-if ${VER_LP} ; then
-	if [ -e /system/lib/modules/selinux_mod.ko ]; then
-		${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
+mod_load=false;
+if [ "$VER_LP" = true ] ; then
+    if [ -e /system/lib/modules/selinux_mod.ko ]; then
+	${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
+	if [ "$?" == "0" ]; then
+	    mod_load=true;
 	fi
+    fi
 fi
 
 # PhilZ
@@ -261,9 +265,12 @@ ${BUSYBOX} touch /dev/recoverycheck
 fi # end of recoverycheck statement
 
 # Continue regular boot (run stock binary)
-if ${VER_KK4} || ${VER_KK3} ; then
+if [ "$VER_KK3" = true ] || [ "$VER_KK4" = true ] ; then
     /system/bin/e2fsck.bin $*
 else
+    if [ "$mod_load" = true ] ; then
+         ${BUSYBOX} rmmod selinux_mod
+    fi
     exec /system/bin/chargemon.bin # no external arguments here? execute chargemon program.
 fi
 
