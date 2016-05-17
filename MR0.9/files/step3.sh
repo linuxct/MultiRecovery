@@ -87,7 +87,7 @@ ${BUSYBOX} chown 0.2000 /system/xbin/busybox
 ${BUSYBOX} chmod 755 /system/xbin/busybox
 ${BUSYBOX} --install -s /system/xbin
 
-echo "copy recoveries to system."
+echo "copy recovery archives to system."
 ${BUSYBOX} cp /data/local/tmp/recovery/twrp.cpio /system/bin/twrp.cpio
 ${BUSYBOX} chown 0.0 /system/bin/twrp.cpio
 ${BUSYBOX} chmod 644 /system/bin/twrp.cpio
