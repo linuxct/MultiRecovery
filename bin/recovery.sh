@@ -37,6 +37,7 @@ ${BUSYBOX} umount -l /storage/sdcard	# SDCard
 ${BUSYBOX} umount -l /storage/sdcard1	# SDCard1
 ${BUSYBOX} umount -l /cache		# Cache
 ${BUSYBOX} umount -l /system		# System
+${BUSYBOX} umount -l /mnt/idd       # Appslog
 
 # External USB umountpoint
 ${BUSYBOX} umount /mnt/usbdisk
@@ -56,9 +57,9 @@ echo 0x0 > /sys/class/illumination/4
 
 # cd to root fs
 cd /
-${BUSYBOX} rm -rf etc init* uevent* default* sdcard
+${BUSYBOX} kill -9 $(${BUSYBOX} ps | ${BUSYBOX} grep rmt_storage | ${BUSYBOX} grep -v grep | ${BUSYBOX} awk -F' ' '{print $1}')
+${BUSYBOX} rm  -rf etc init* uevent* default* sdcard
 ${BUSYBOX} cpio -i -u < /sbin/recovery.cpio
-
 
 # Execute recovery INIT
 exec /init

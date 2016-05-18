@@ -26,16 +26,32 @@ set6=/sys/class/illumination/6
 set7=/sys/class/illumination/7
 set8=/sys/class/illumination/8
 
-WORKDIR="/cache/multirecovery"
+LOG_PATH="/cache/multirecovery"
+LOG_FILE="${LOG_PATH}/mr.log"
+WORKDIR="${LOG_PATH}"
+
+# Function for logging
+ECHOL(){
+  echo "$*" >> ${LOG_FILE}
+  return 0
+}
+EXECL(){
+  echo "$*" >> ${LOG_FILE}
+  $* 2 >> ${LOG_FILE}
+  _RET=$?
+  echo "RET=${_RET}" >> ${LOG_FILE}
+  return ${_RET}
+}
 
 # Predefined applet names
-SET_ALIAS ()
+SET_ALIASES ()
 {
   if [ -n "${BUSYBOX}" ] ; then
      MKDIR="${BUSYBOX} mkdir"
      CHOWN="${BUSYBOX} chown"
      CHMOD="${BUSYBOX} chmod"
      TOUCH="${BUSYBOX} touch"
+	 TEE="${BUSYBOX} tee"
      CAT="${BUSYBOX} cat"
      SLEEP="${BUSYBOX} sleep"
      KILL="${BUSYBOX} kill"
@@ -79,70 +95,82 @@ OS_VERSION ()
 
 }
 
-if [ ! -f /dev/recoverycheck -a -n "${BUSYBOX}" ]; then
+if [ ! -f /dev/recoverycheck -o -e /cache/recovery/boot -a -n "${BUSYBOX}" ]; then
 
-SET_ALIAS
-# Remount rootfs rw
-${MOUNT} -o remount,rw rootfs /
+	SET_ALIASES
 
-# Create a working directory
-if [ ! -d "${WORKDIR}" ]; then
-	${MKDIR} ${WORKDIR}
-	${CHOWN} system.cache ${WORKDIR}
-	${CHMOD} 770 ${WORKDIR}
-fi
+	# Remount rootfs rw
+	${MOUNT} -o remount,rw rootfs /
 
-# Clear if exist
-if [ ! -e ${WORKDIR}/keycheck ]; then
-	${RM} ${WORKDIR}/keyevent*
-	${RM} ${WORKDIR}/keycheck_camera
-	${RM} ${WORKDIR}/keycheck_camera2
-	${RM} ${WORKDIR}/keycheck_up
-	${RM} ${WORKDIR}/keycheck_down
-	
-fi
-
-# Trigger BOTH Blue LEDs
-echo 255 > ${B_LED}
-echo 0x5 > ${set0}
-
-# Initialize illumination bar variables
-echo 0xFF > ${set6}
-echo 0x0  > ${set7}
-echo 0x3B > ${set8}
-echo 0x11 > ${set4} # set4 must be last always, don't ask why
-
-for EVENTDEV in $(${LS} /dev/input/event* )
-do
-	SUFFIX="$(${EXPR} ${EVENTDEV} : '/dev/input/event\(.*\)')"
-	${CAT} ${EVENTDEV} > ${WORKDIR}/keyevent${SUFFIX} &
-done
-${SLEEP} 2
-
-${PS} > ${WORKDIR}/ps.log
-${CHMOD} 660 ${WORKDIR}/ps.log
-
-for CATPROC in $(${PS} | ${GREP} /dev/input/event | ${GREP} -v grep | ${AWK} '{print $1}')
-do
-       ${KILL} -9 ${CATPROC}
-done
-
-# VOL-UP
-${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0073 .... ....$' > ${WORKDIR}/keycheck_up
-# VOL-DOWN
-${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0072 .... ....$' > ${WORKDIR}/keycheck_down
-# KEY_CAMERA_FOCUS
-${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0210 .... ....$' > ${WORKDIR}/keycheck_camera
-${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORKDIR}/keycheck_camera2
-
-
-OS_VERSION
-# Check if we need to change SELinux modes
-if ${VER_LP} ; then
-	if [ -e /system/lib/modules/selinux_mod.ko ]; then
-		${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
+	# Work directory & logfile rotate
+	if [ ! -d "${LOG_PATH}" ]; then
+		${MKDIR} ${LOG_PATH}
+		${CHOWN} 1000.2001 ${LOG_PATH}
+		${CHMOD} 770 ${LOG_PATH}
+	else
+		if [ -f ${LOG_FILE} ]; then
+			${RM} ${LOG_FILE}
+			${RM} ${WORKDIR}/keyevent*
+			${RM} ${WORKDIR}/keycheck_camera
+			${RM} ${WORKDIR}/keycheck_camera2
+			${RM} ${WORKDIR}/keycheck_up
+			${RM} ${WORKDIR}/keycheck_down
+		fi
+		${TEE} ${LOG_FILE}
+		${CHMOD} 660 ${LOG_FILE}
 	fi
-fi
+
+	if [ ! -d "${WORKDIR}" ]; then
+		${MKDIR} ${WORKDIR}
+		${CHOWN} 1000.2001 ${WORKDIR}
+		${CHMOD} 770 ${WORKDIR}
+	fi
+
+	# Trigger BOTH Blue LEDs
+	echo 255 > ${B_LED}
+	echo 0x5 > ${set0}
+
+	# Initialize illumination bar variables
+	echo 0xFF > ${set6}
+	echo 0x0  > ${set7}
+	echo 0x3B > ${set8}
+	echo 0x11 > ${set4} # set4 must be last always, don't ask why
+
+	for EVENTDEV in $(${LS} /dev/input/event* )
+	do
+	  SUFFIX="$(${EXPR} ${EVENTDEV} : '/dev/input/event\(.*\)')"
+	  ${CAT} ${EVENTDEV} > ${WORKDIR}/keyevent${SUFFIX} &
+	done
+	${SLEEP} 2
+
+	${PS} >> ${LOG_FILE}
+
+	for CATPROC in $(${PS} | ${GREP} /dev/input/event | ${GREP} -v grep | ${AWK} '{print $1}')
+	do
+        ${KILL} -9 ${CATPROC}
+	done
+
+	# VOL-UP
+	${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0073 .... ....$' > ${WORKDIR}/keycheck_up
+	# VOL-DOWN
+	${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0072 .... ....$' > ${WORKDIR}/keycheck_down
+	# KEY_CAMERA_FOCUS
+	${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 0210 .... ....$' > ${WORKDIR}/keycheck_camera
+	${HEXDUMP} ${WORKDIR}/keyevent* | ${GREP} -e '^.* 0001 02fe .... ....$' > ${WORKDIR}/keycheck_camera2
+
+	OS_VERSION
+	# Check if we need to change SELinux modes
+	mod_load=false;
+	if [ "$VER_LP" = true ] ; then
+		ECHOL "# running version is lollipop..."
+		if [ -e /system/lib/modules/selinux_mod.ko ]; then
+		   ${BUSYBOX} insmod /system/lib/modules/selinux_mod.ko
+		fi
+		if [ "$?" == "0" ]; then
+		   ECHOL "# loading selinux_mod..."
+	       mod_load=true;
+		fi
+	fi
 
 # PhilZ
 if [ -s ${WORKDIR}/keycheck_down ]; then
@@ -260,12 +288,14 @@ ${BUSYBOX} touch /dev/recoverycheck
 fi # end of recoverycheck statement
 
 # Continue regular boot (run stock binary)
-if ${VER_KK4} || ${VER_KK3} ; then
+if [ "$VER_KK3" = true ] || [ "$VER_KK4" = true ] ; then
     /system/bin/e2fsck.bin $*
+	ECHOL "# running version is KitKat..."
 else
-    if [ -e /system/lib/modules/selinux_mod.ko ]; then
-	${BUSYBOX} rmmod /system/lib/modules/selinux_mod.ko
+    if [ "$mod_load" = true ] ; then
+        ${BUSYBOX} rmmod selinux_mod
+		ECHOL "# unloading selinux_mod..."
     fi
-    /system/bin/chargemon.bin $*
+    exec /system/bin/chargemon.bin # run chargemon binary.
 fi
 

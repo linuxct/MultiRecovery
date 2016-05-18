@@ -26,7 +26,7 @@ static int __init selinux_mod_init(void)
 
 	if(!selinux_is_enabled)
 	{
-		printk(KERN_INFO "[%s] Failed to find selinux_is_enabled address\n", __this_module.name);
+		printk(KERN_INFO "[%s] Failed to find selinux_is_enabled\n", __this_module.name);
 		return 1;
 	}
 

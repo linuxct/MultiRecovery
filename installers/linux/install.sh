@@ -14,11 +14,11 @@ app_exists()
 }
 
 openurl()
-{
-   if app_exists xdg-open ; then
+{  
+   if app_exists xdg-open ; then      
       xdg-open "$1"
    elif app_exists gnome-open ; then
-      gnome-open "$1"
+      gnome-open "$1"      
    else
        echo "Couldn't detect the web browser to use."
    fi
@@ -26,13 +26,13 @@ openurl()
 
 baner()
 {
-    printf " ============================================ \n"
-    printf " |    *** MultiRecovery Installer ***       | \n"
-    printf " |         for Xperia M2 (& M2 Aqua)        | \n"
-    printf " |      by AlexJ, Andrej732 & LinuxCT       | \n"
-    printf " |   Based on NUT's and Rachit Rawat work   | \n"
     printf " =========================================== \n"
-    printf "\n"
+    printf " |                                          |\n"
+    printf " |    *** MultiRecovery Installer ***       |\n"
+    printf " |         for Xperia M2 (& M2 Aqua)        |\n"
+    printf " |                                          |\n"
+    printf " ===========================================\n"
+
     printf " ===========================================\n"
     printf "  Connect Xperia M2 with USB debugging on.. \n"
     printf " ===========================================\n"
