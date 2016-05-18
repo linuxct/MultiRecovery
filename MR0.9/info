@@ -1,3 +1,6 @@
+MultiRecovery Installer for Xperia M2 (& M2 Aqua)
+     Elaborated by AleksJ and LinuxCT 
+
 Recovery Options:
 1. CWM 6.0.5.1
 2. Philz touch 6.59.0
@@ -13,7 +16,7 @@ Installation:
 . Extract package to your pc.
 . Run the script to install the recovery.
 
-To enter recovery, press the appropriate button on boot when the cyan led glows.
+To enter into recovery mode press the appropriate button on boot when the cyan led glows.
 . Volume Down   - Philz
 . Volume UP     - TWRP
 . Camera button - CWM

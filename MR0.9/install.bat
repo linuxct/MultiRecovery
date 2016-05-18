@@ -16,10 +16,8 @@ rem                                           __/ |
 rem                                          |___/ 
 echo " ============================================ "
 echo " |                                          | "
-echo " |    *** MultiRecovery 0.9 Installer ***   | "
+echo " |    *** MultiRecovery Installer ***       | "
 echo " |         for Xperia M2 (& M2 Aqua)        | "
-echo " |      by Andrej732, LinuxCT, AlexJ        | "
-echo " |   Based on NUT's and Rachit Rawat work   | "
 echo " |                                          | "
 echo " ============================================ "
 
