@@ -26,6 +26,12 @@ To enter recovery, press the appropriate button on boot when the cyan led glows.
 
 Changelog:
 
+v0.9
+-  Update and recompile Android _'init'_.
+-  Update CWM and PhilZ to latest builds.
+-  Add _selinux_mod_ and _copymodulecrc_ to installation script.
+-  The module loading stage is logged in mr.log file.
+ 
 v0.8
 - Added installation script with separate adb support for Linux OS.
 - Stripped version of byeselinux LKM to reduce size.
