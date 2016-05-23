@@ -14,11 +14,14 @@ rem      | | \ \  __/ (_| (_) \ V /  __/ |  | |_| |
 rem      |_|  \_\___|\___\___/ \_/ \___|_|   \__, |
 rem                                           __/ |
 rem                                          |___/ 
-echo.
-echo **  MultiRecovery Installer for Xperia M2 LB devices  **
-echo **         By Rachit Rawat, [NUT]                     ** 
-echo **   Modified by AleksJ, Andrej732, LinuxCT           **
-echo.
+echo " ============================================ "
+echo " |                                          | "
+echo " |    *** MultiRecovery Installer     ***   | "
+echo " |         for Xperia M2 (& M2 Aqua)        | "
+echo " |      by Andrej732, LinuxCT, AlexJ        | "
+echo " |   Based on NUT's and Rachit Rawat work   | "
+echo " |                                          | "
+echo " ============================================ "
 
 echo.
 echo =================================================
@@ -33,7 +36,7 @@ echo Device Detected.
 echo.
 
 :menu
-echo 1. Install MultiRecovery v0.8 (Android 4.3/4.4.x/5.1.1)
+echo 1. Install MultiRecovery (Android 4.3/4.4.x/5.1.1)
 echo 2. Uninstall MultiRecovery
 echo 3. Exit
 
@@ -50,13 +53,13 @@ echo          Installing MultiRecovery ...
 echo ===============================================
 adb shell "mkdir /data/local/tmp/recovery"
 adb push recovery.sh /data/local/tmp/recovery
-adb push script.sh /data/local/tmp/recovery
+adb push dummy.sh /data/local/tmp/recovery
 adb push twrp/twrp.cpio /data/local/tmp/recovery
 adb push philz/philz.cpio /data/local/tmp/recovery
 adb push cwm/cwm.cpio /data/local/tmp/recovery
-adb push byeselinux/byeselinux.ko /data/local/tmp/recovery
-adb push byeselinux/byeselinux.sh /data/local/tmp/recovery
-adb push byeselinux/modulecrcpatch /data/local/tmp/recovery
+adb push selinuxchnger/selinux_mod.ko /data/local/tmp/recovery
+adb push selinuxchnger/selinux_mod.sh /data/local/tmp/recovery
+adb push selinuxchnger/copymodulecrc /data/local/tmp/recovery
 adb push busybox /data/local/tmp/recovery
 adb push step3.sh /data/local/tmp/recovery
 adb shell "chmod 755 /data/local/tmp/recovery/busybox"

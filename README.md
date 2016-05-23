@@ -1,19 +1,19 @@
 Multiple Recovery solution for Xperia M2
 ========================================
 
-Recovey installer / flashable zip for locked bootloader. Compatible with Windows/Linux/Mac.
+Recovey installer / flashable zip for locked boot loader. Compatible with Windows/Linux/Mac.
 
 Uses chargemon and e2fsck as hijack binary.
 
 Requirements:
-1. Rooted XPERIA M2 device
-2. Installed ADB drivers
-3. 18.0.C.1.13 or above firmware
+- Rooted Sony Xperia M2 device
+- Installed ADB Interface Driver
+- Stock firmwares 18.0.C.1.13 or above
 
 Recovery Options:
-1. CWM 6.0.5.1
-2. Philz touch 6.59.0
-3. TWRP 2.8.1.0
+- CWM 6.0.5.1
+- Philz touch 6.59.0
+- TWRP 2.8.1.0
 
 Installation:
 - Extract package to your pc.
@@ -25,6 +25,18 @@ To enter recovery, press the appropriate button on boot when the cyan led glows.
 - Camera button - CWM
 
 Changelog:
+
+v0.9
+-  Update and recompile Android _'init'_.
+-  Update CWM and PhilZ to latest builds.
+-  Add _selinux_mod_ and _copymodulecrc_ to installation script.
+-  The module loading stage is logged in mr.log file.
+ 
+v0.8
+- Added installation script with separate adb support for Linux OS.
+- Stripped version of byeselinux LKM to reduce size.
+- Relevant bug fixes, update LEDs (media and notifications one) in regular Xperia M2.
+- MOBILE [aka Emergency] version, which consists on a shell script that can be executed from an elevated Terminal Emulator.
 
 v0.7
 - Use of Chargemon instead of e2fsck as base script to trigger the Recovery.
